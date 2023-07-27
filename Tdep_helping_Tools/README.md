@@ -1,5 +1,5 @@
+# Modol Thermal Conductivity Data Analysis Script
 1. modol_thermal_conductivity_analysis.py
-# Thermal Conductivity Data Analysis Script
 This script is designed to process thermal conductivity data from a tdep code, specifically from two HDF5 files:
 outfile.cumulative_kappa.hdf5: Contains cumulative thermal conductivity data.
 outfile.grid_thermal_conductivity.hdf5: Contains spectral thermal conductivity data.
