@@ -88,7 +88,7 @@ def load_and_process_modal_kappa_data(filepath):
 
 # plot_cumulative_kappa_data(), plot_spectral_kappa_data(), dump_data_for_gnuplot() here
 
-def plot_cumulative_kappa_data(df, xrange=None, yrange=None, grid=False):
+def plot_cumulative_kappa_data(df, xrange=None, yrange=None, grid=False, title=None):
     # Plotting the cumulative data
     plt.plot(df['Freq'], df['cumulative_kxx'], label=r'$\kappa_{xx}$')
     plt.plot(df['Freq'], df['cumulative_kyy'], label=r'$\kappa_{yy}$')
@@ -96,17 +96,18 @@ def plot_cumulative_kappa_data(df, xrange=None, yrange=None, grid=False):
     plt.xlabel('Frequency (THz)')
     plt.ylabel('Cumulative Thermal Conductivity (W/m-K)')
     plt.legend()
+    if title:
+        plt.title(title)
     if grid:
         plt.grid(True)
     else:
         plt.grid(False)
-    plt.title('Cumulative Thermal Conductivity vs. Frequency')
     if xrange:
         plt.xlim(xrange[0], xrange[1])
     if yrange:
         plt.ylim(yrange[0], yrange[1])
 
-def plot_spectral_kappa_data(freq, sk1, sk2, sk3, xrange=None, yrange=None, grid=False):
+def plot_spectral_kappa_data(freq, sk1, sk2, sk3, xrange=None, yrange=None, grid=False, title=None):
     # Plotting the spectral kappa data
     plt.plot(freq, sk1, label=r'$\kappa_{xx}$')
     plt.plot(freq, sk2, label=r'$\kappa_{yy}$')
@@ -114,11 +115,12 @@ def plot_spectral_kappa_data(freq, sk1, sk2, sk3, xrange=None, yrange=None, grid
     plt.xlabel('Frequency (THz)')
     plt.ylabel('Spectral Thermal Conductivity (W/m-K)')
     plt.legend()
+    if title:
+        plt.title(title)
     if grid:
         plt.grid(True)
     else:
         plt.grid(False)
-    plt.title('Spectral Thermal Conductivity vs. Frequency')
     if xrange:
         plt.xlim(xrange[0], xrange[1])
     if yrange:
@@ -136,6 +138,7 @@ def main():
     parser.add_argument("--spectral_xrange", nargs=2, type=float, help="Set the x-axis range for the spectral plot (Part B).")
     parser.add_argument("--spectral_yrange", nargs=2, type=float, help="Set the y-axis range for the spectral plot (Part B).")
     parser.add_argument("--gridon", action="store_true", help="Enable grid in the plots.")
+    parser.add_argument("--title", action="store_true", help="Insert title of each sub figure.")
     args = parser.parse_args()
 
     # Load and process cumulative kappa data
@@ -174,9 +177,13 @@ def main():
 
     plt.subplot(1, 2, 1)
     plot_cumulative_kappa_data(df, args.cumulative_xrange, args.cumulative_yrange, grid=args.gridon)
+    if args.title:
+        plt.title("Cumulative Thermal Conductivity vs. Frequency")
 
     plt.subplot(1, 2, 2)
     plot_spectral_kappa_data(freq, sk1, sk2, sk3, args.spectral_xrange, args.spectral_yrange, grid=args.gridon)
+    if args.title:
+        plt.title("Spectral Thermal Conductivity vs. Frequency")
 
     plt.tight_layout()
 
