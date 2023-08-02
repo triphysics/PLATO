@@ -5,3 +5,5 @@
 
 2. Cophonicity provides a simple way to quantify phonon DOS overlap in a material. see https://en.wikipedia.org/wiki/Cophonicity and reference therein for more details. This is been tested with TDEP code but should work with all existing codes. 
 
+
+3. Atom_Projected_Phonon_Dispersion provies a way to resolve the phonon dispersion in terms of atomic contributions.
