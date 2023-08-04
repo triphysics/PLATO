@@ -273,6 +273,8 @@ for distance in x_klabels[:]:
 
 
 # Write the data to a dat file
+output_filename_prefix = "atom_projected_phonon_data"
+write_data_to_file(output_filename_prefix)
 plt.tight_layout()
 plt.savefig(output_filename)
 plt.show()
