@@ -51,7 +51,7 @@ try:
 except ImportError:
     from yaml import Loader
 
-def load_phonon_data(filename):
+def read_band_yaml(filename):
 
     """
     Load phonon data from a YAML file.
@@ -143,7 +143,7 @@ def plot_cmap_phonon_band(cmap_name, norm):
 
     for ibnd in range(num_bnd):
         plt.scatter(band_distance1, phonon_freq1[:, ibnd], 
-                    s=10 * abs(normalized_amplitudes_all[:, ibnd]), 
+                    s=20 * abs(normalized_amplitudes_all[:, ibnd]), 
                     c=normalized_amplitudes_all[:, ibnd], 
                     cmap=cmap_name, alpha=0.2, norm=norm)
 
@@ -197,7 +197,7 @@ def write_data_to_file(output_filename_prefix):
                     file.write(f"{distance:.6f} {frequency:.6f} {amplitude:.6f}\n")
     
 filename = "band.yaml"
-band_distance, phonon_freq, normalized_amplitudes, num_kpt, num_bnd, x_labels, eigvec_data, Bcell, Q1, B1, num_atm, phonon_amplitudes = load_phonon_data(filename)
+band_distance, phonon_freq, normalized_amplitudes, num_kpt, num_bnd, x_labels, eigvec_data, Bcell, Q1, B1, num_atm, phonon_amplitudes = read_band_yaml(filename)
 
 # Prepare data for color map. Gather normalized_amplitudes of all atoms to be used in cmap plot. Pretty sure there a 
 # better way of doing this ( I am dumb :( )
@@ -236,18 +236,19 @@ else:
     atom_colors = None
     output_filename = "Phonon_atom_projected_cmap.pdf"
 
-fig, ax = plt.subplots(figsize=(8, 5))
+fig, ax = plt.subplots(figsize=(6, 4))
 
 if not scatter_mode:
     cmap_name = args.cmap
     norm = cm.colors.Normalize(vmax=0.5, vmin=-0.5)
     plot_cmap_phonon_band(cmap_name, norm)
     cbar = plt.colorbar()
-    cbar.set_label('Atomic Contribution', rotation=270, labelpad=15)
+    cbar.set_label('Atomic Contribution', rotation=270, labelpad=15, fontsize=18)
     cbar_ticks = [-0.5, 0, 0.5]
     cbar_ticklabels = [args.atom1_label, "", args.atom2_label]
     cbar.set_ticks(cbar_ticks)
     cbar.set_ticklabels(cbar_ticklabels)
+    cbar.ax.tick_params(labelsize=18)
 else:
     plot_scatter_phonon_band(atom_colors)
     add_legend( atom_labels)
@@ -257,15 +258,23 @@ if args.gnuplot:
     write_data_to_file(output_filename_prefix)
 
 ax.axhline(y=0, color='black', linestyle='--', linewidth=1)  # Zero line
-ax.set_ylabel('Phonon Frequency (THz)')
-ax.set_title('Projected Phonon Band Structure')
+ax.set_ylabel('Phonon Frequency (THz)', fontsize=18)
+
+#ax.set_title('Projected Phonon Band Structure')
 
 # Calculate midpoints between k-points
 x_klabels = (band_distance[np.r_[[0], np.cumsum(B1)-1]])
 ax.set_xlim(x_klabels[0], x_klabels[-1])
 
+x_labels = [w.replace('G','Γ') for w in x_labels]
+
 # Set the x-axis ticks and labels
 plt.xticks(x_klabels, x_labels)
+
+ax.tick_params(axis="x", labelsize=18, direction="in", top=False, length=8, which="major", width=1)
+ax.tick_params(axis="x", which='minor', length=4, direction="in", top=False, width=1)
+ax.tick_params(axis="y", labelsize=18, direction="in", right=True, length=8, which="major", width=1)
+ax.tick_params(axis="y",which='minor', length=4, direction="in", right=True, width=1)
 
 x_klabels=x_klabels[1:-1]
 for distance in x_klabels[:]:
