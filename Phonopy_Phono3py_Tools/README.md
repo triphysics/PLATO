@@ -35,7 +35,7 @@ python group_velocity_projected_phonons.py --f band_gv.yaml
 
 This script reads a YAML file containing phonon band structure data from Phonopy, calculates the Inverse Participation Ratio (IPR) for each phonon mode, and generates a plot with the phonon dispersion overlaid by IPR values.
 
-##Usage
+## Usage
 ```shell
     python IPR_phonopy.py [--f FILENAME] [--cmap COLORMAP] [--alpha ALPHA] [--gnuplot] [--format FORMAT]
                                          [--width WIDTH] [--height HEIGHT] [--ymax YMAX]
