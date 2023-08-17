@@ -21,8 +21,7 @@ python atom_projected_phonons.py [--scatter] [--cmap COLORMAP] [--gnuplot] [--at
 This Python script reads phonon dispersion data from a phonopy output file named "band.yaml" and creates a plot of the average phonon group velocities projected onto the phonon dispersion curve. 
 
 ## Features
-1. Load phonon dispersion data from the "band.yaml" file.
-2. Calculate the norm of phonon group velocity and plot them on phonon dispersion/
+1. Load phonon dispersion data from the "band.yaml" file. Calculate the norm of phonon group velocity and plot them on phonon dispersion.
 
 ## Usage
 1. Place the "band.yaml" file in the working directory. MgO band_gv.yaml file is supplied with the code.
@@ -30,4 +29,14 @@ This Python script reads phonon dispersion data from a phonopy output file named
 
 ```shell
 python group_velocity_projected_phonons.py --f band_gv.yaml
+```
+
+# 3. Phonopy Phonon Dispersion Plotter with Inverse Participation Ratio (IPR)
+
+This script reads a YAML file containing phonon band structure data from Phonopy, calculates the Inverse Participation Ratio (IPR) for each phonon mode, and generates a plot with the phonon dispersion overlaid by IPR values.
+
+##Usage
+```shell
+    python IPR_phonopy.py [--f FILENAME] [--cmap COLORMAP] [--alpha ALPHA] [--gnuplot] [--format FORMAT]
+                                         [--width WIDTH] [--height HEIGHT] [--ymax YMAX]
 ```
