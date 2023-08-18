@@ -1,4 +1,4 @@
-# Group velocity projected phonon dispersion plotter
+# Mode Gruneisen projected phonon dispersion plotter
 
 This Python script reads the phonon dispersion data from a TDEP output file "outfile.dispersion_relations.hdf5"
 and project the mode_gruneisen on phonon dispersion.
