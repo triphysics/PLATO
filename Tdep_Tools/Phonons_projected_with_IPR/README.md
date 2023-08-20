@@ -9,16 +9,10 @@ $$
 $$
 
 
-$$
-P_{\lambda}^{-1}=N \sum_{i}\left(\sum_{\alpha} e_{i \alpha, \lambda}^{*} e_{i \alpha, \lambda}\right)^{2}
-$$
-
-where *N* is the total number of atoms in primitive cell. and $e_{i \alpha, \lambda}$ is the αth eigenvector component of eigenmode λ for the ith atom. Each eigenmode λ is specified by the wave-vector **k** and branch index s. 
-
-
-where *N* is the total number of atoms in primitive cell. and $e_{k; \boldsymbol{q}\lambda}$ is the $j^{th}$ eigenvector component of eigenmode $\lambda$ for the $k^{th}$ atom. Each eigenmode λ is specified by the wave-vector **k** and branch index j. 
+where *N* is the total number of atoms in primitive cell. and $e_{i \alpha, \lambda}$ is the αth eigenvector component of eigenmode λ for the ith atom. Each eigenmode λ is specified by the wave-vector **k** and branch index j.  Note that the eigenvectors are already normalized with respect to mass, therefore mass term is ignored in the code.
 
 ## Usage
 ```shell
     python IPR_projected_phonon_tdep.py [--f FILENAME] [--cmap COLORMAP] [--alpha ALPHA] [--gnuplot] [--format FORMAT]
                                          [--width WIDTH] [--height HEIGHT] [--ymax YMAX]
+```
