@@ -2,7 +2,7 @@
 
 This script reads a hdf5 file containing phonon band structure data from TDEP, calculates the Inverse Participation Ratio (IPR) for each phonon mode, and generates a plot with the phonon dispersion overlaid by IPR values.
 
-### Note the IPR is defined as:
+### IPR is defined as:
 
 $$
 \frac{1}{PR_{\boldsymbol{q}j}} = N_{\kappa}  \left(\sum_{\kappa}^{N_{\kappa}} \frac{|\boldsymbol{e}(\kappa;\boldsymbol{q}j)|^{2}}{M_{\kappa}}\right)^{2}
