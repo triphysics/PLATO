@@ -5,8 +5,7 @@ This script reads a hdf5 file containing phonon band structure data from TDEP, c
 ### Note the IPR is defined as:
 
 $$
-PR_{\boldsymbol{q}j} = \left(\sum_{\kappa}^{N_{\kappa}} \frac{|\boldsymbol{e}(\kappa;\boldsymbol{q}j)|^{2}}{M_{\kappa}}\right)^{2} \Bigg/
-N_{\kappa} \sum_{\kappa}^{N_{\kappa}} \frac{|\boldsymbol{e}(\kappa;\boldsymbol{q}j)|^{4}}{M_{\kappa}^{2}}
+\frac{1}{PR_{\boldsymbol{q}j}} = N_{\kappa}  \left(\sum_{\kappa}^{N_{\kappa}} \frac{|\boldsymbol{e}(\kappa;\boldsymbol{q}j)|^{2}}{M_{\kappa}}\right)^{2}
 $$
 
 
