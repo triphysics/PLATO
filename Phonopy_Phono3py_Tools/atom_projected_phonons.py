@@ -266,7 +266,7 @@ ax.set_ylabel('Phonon Frequency (THz)', fontsize=18)
 x_klabels = (band_distance[np.r_[[0], np.cumsum(B1)-1]])
 ax.set_xlim(x_klabels[0], x_klabels[-1])
 
-x_labels = [w.replace('G','Γ') for w in x_labels]
+#x_labels = [w.replace('G','Γ') for w in x_labels]
 
 # Set the x-axis ticks and labels
 plt.xticks(x_klabels, x_labels)
