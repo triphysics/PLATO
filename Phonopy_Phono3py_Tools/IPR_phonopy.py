@@ -59,11 +59,8 @@ def read_band_yaml(filename):
     num_kpt = len(data['phonon'])
     num_bnd = len(data['phonon'][0]['band'])
     num_atm = data['natom']
-
     phonon_freq = np.zeros([num_kpt, num_bnd])
     ipr=np.zeros([num_kpt, num_bnd])
-    phonon_amplitudes = np.zeros([num_kpt, num_bnd, num_atm])
-    normalized_amplitudes = np.zeros([num_kpt, num_bnd, num_atm])
     band_distance = [data['phonon'][ikpt]['distance'] for ikpt in range(num_kpt)]
 
     labels = []
