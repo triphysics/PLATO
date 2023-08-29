@@ -145,6 +145,7 @@ parser.add_argument("--format", default="png", type=str, help="Output file forma
 parser.add_argument("--width", default=6, type=float, help="Width of the figure (default: 6)")
 parser.add_argument("--height", default=4, type=float, help="Height of the figure (default: 4)")
 parser.add_argument("--ymax", type=float, help="Maximum y-axis limit in THz.")
+parser.add_argument("--cmax", type=float, help="Maximum limit for cmap.")
 
 args = parser.parse_args()
 filename=args.f
@@ -159,7 +160,10 @@ fig, ax = plt.subplots(figsize=(args.width, args.height))
 
 cmap_name = args.cmap
 alpha =args.alpha
-norm = cm.colors.Normalize(vmax=np.max(gv), vmin=np.min(gv))
+if args.cmax is not None:
+    norm = cm.colors.Normalize(vmax=args.cmax, vmin=np.min(gv))
+else:
+    norm = cm.colors.Normalize(vmax=np.max(gv), vmin=np.min(gv))
 plot_cmap_phonon_band(cmap_name, norm, alpha)
 cbar = plt.colorbar()
 cbar.set_label('v (km/s)', rotation=270, labelpad=35, fontsize=18)
