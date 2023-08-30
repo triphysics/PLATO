@@ -42,7 +42,9 @@ import matplotlib.cbook as cbook
 from matplotlib import cm
 import argparse
 import h5py
-
+from matplotlib.ticker import FuncFormatter
+import matplotlib.ticker as ticker
+plt.rcParams['font.family'] = 'Arial'
 try:
     from yaml import CLoader as Loader
 except ImportError:
@@ -158,6 +160,7 @@ def write_data_to_file(output_filename_prefix):
                     file.write(f"{distance:.6f} {frequency:.6f} {amplitude:.6f}\n")
 
 
+
 band_distance, phonon_freq, x_ticks, x_klabels,normalized_amplitudes, phonon_amplitudes, num_bnd, num_atm,  num_kpt =  read_band_hdf5(filename)
 
 print(x_klabels)
@@ -204,7 +207,7 @@ if not scatter_mode:
     norm = cm.colors.Normalize(vmax=0.5, vmin=-0.5)
     plot_cmap_phonon_band(cmap_name, norm)
     cbar = plt.colorbar()
-    cbar.set_label('Atomic Contribution', rotation=270, labelpad=15, fontsize=18)
+#    cbar.set_label('Atomic Contribution', rotation=270, labelpad=15, fontsize=18)
     cbar_ticks = [-0.5, 0, 0.5]
     cbar_ticklabels = [args.atom1_label, "", args.atom2_label]
     cbar.set_ticks(cbar_ticks)
@@ -221,9 +224,9 @@ if args.gnuplot:
 x_klabels = [w.replace('G','Γ') for w in x_klabels]
 
 ax.axhline(y=0, color='black', linestyle='--', linewidth=1)  # Zero line
-ax.set_ylabel('Phonon Frequency (THz)', fontsize=18)
+ax.set_ylabel('Frequency (THz)', fontsize=18)
 ax.set_xlim(x_ticks[0], x_ticks[-1])
-
+ax.yaxis.set_major_locator(ticker.MaxNLocator(nbins=4))
 ax.tick_params(axis="x", labelsize=18, direction="in", top=False, length=8, which="major", width=1)
 ax.tick_params(axis="x", which='minor', length=4, direction="in", top=False, width=1)
 ax.tick_params(axis="y", labelsize=18, direction="in", right=True, length=8, which="major", width=1)
