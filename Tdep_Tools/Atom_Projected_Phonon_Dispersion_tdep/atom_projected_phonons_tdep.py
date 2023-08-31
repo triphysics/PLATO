@@ -57,7 +57,7 @@ def read_band_hdf5(filename):
     x = np.array(data["q_values"])
     ys = np.array(data["frequencies"])
     q_ticks = np.array(data["q_ticks"])
-    q_ticklabels = data.attrs["q_tick_labels"].decode().split()
+    q_ticklabels1 = data.attrs["q_tick_labels"].decode().split()
     num_kpt=len(x)
     num_bnd = data['frequencies'].shape[1]
     #print(num_bnd)
@@ -89,6 +89,16 @@ def read_band_hdf5(filename):
     else:
         print("more than 2 atoms are present better use --scatter plot for best results")
         normalized_amplitudes=phonon_amplitudes
+ 
+    q_ticklabels = []
+
+    for label in q_ticklabels1:
+        if len(label) > 1:
+            # If the string has more than one letter, split it and join with "|"
+            modified_label = ',|'.join(label)
+            q_ticklabels.append(modified_label)
+        else:
+            q_ticklabels.append(label)
 
     return x, ys, q_ticks, q_ticklabels, normalized_amplitudes, phonon_amplitudes, num_bnd, num_atm,  num_kpt
 
