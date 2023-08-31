@@ -57,7 +57,7 @@ def read_band_hdf5(filename):
     x = np.array(data["q_values"])
     ys = np.array(data["frequencies"])
     q_ticks = np.array(data["q_ticks"])
-    q_ticklabels = data.attrs["q_tick_labels"].decode().split()
+    q_ticklabels1 = data.attrs["q_tick_labels"].decode().split()
     num_kpt=len(x)
     num_bnd = data['frequencies'].shape[1]
     #print(num_bnd)
@@ -89,10 +89,20 @@ def read_band_hdf5(filename):
     else:
         print("more than 2 atoms are present better use --scatter plot for best results")
         normalized_amplitudes=phonon_amplitudes
+ 
+    q_ticklabels = []
+
+    for label in q_ticklabels1:
+        if len(label) > 1:
+            # If the string has more than one letter, split it and join with "|"
+            modified_label = ',|'.join(label)
+            q_ticklabels.append(modified_label)
+        else:
+            q_ticklabels.append(label)
 
     return x, ys, q_ticks, q_ticklabels, normalized_amplitudes, phonon_amplitudes, num_bnd, num_atm,  num_kpt
 
-def plot_cmap_phonon_band(cmap_name, norm):
+def plot_cmap_phonon_band(cmap_name, norm, alpha):
     """
     Plot the cmap phonon band structure for a specific atom.
 
@@ -105,11 +115,11 @@ def plot_cmap_phonon_band(cmap_name, norm):
         plt.scatter(band_distance1, phonon_freq1[:, ibnd],
                     s=20 * abs(normalized_amplitudes_all[:, ibnd]),
                     c=normalized_amplitudes_all[:, ibnd],
-                    cmap=cmap_name, alpha=0.2, norm=norm)
+                    cmap=cmap_name, alpha=alpha, norm=norm)
         # Additional code for cmap plot goes here...
 
 
-def plot_scatter_phonon_band(atom_colors):
+def plot_scatter_phonon_band(atom_colors, s):
 
     """
     Plot the projected phonon band structure for a specific atom.
@@ -122,7 +132,7 @@ def plot_scatter_phonon_band(atom_colors):
     for ibnd in range(num_bnd):
         for iatm in range(num_atm):
             plt.scatter(band_distance, phonon_freq[:, ibnd],
-                    s=10 * abs(phonon_amplitudes[:, ibnd, iatm]),
+                    s=s * abs(phonon_amplitudes[:, ibnd, iatm]),
                     c=atom_colors[iatm], alpha=0.2)
 
 def add_legend(atom_labels):
@@ -179,10 +189,15 @@ atom_colors = ['cyan', 'm', 'red', 'blue', 'green', 'orange', 'purple', 'pink']
 norm = cm.colors.Normalize(vmax=np.max(normalized_amplitudes_all[:,:]), vmin=np.min(normalized_amplitudes_all[:,:]))
 parser = argparse.ArgumentParser(description="Atom-Projected Phonon Dispersion Plotter")
 parser.add_argument("--scatter", action="store_true", help="Use scatter plot mode")
+parser.add_argument("--s", default=10, type=float, help="size of symbol in scatter plot")
 parser.add_argument("--cmap", default="cool", type=str, help="Use cmap plot mode with specified colormap (default: cool)")
-parser.add_argument("--atom1_label", default="atom1", type=str, help="Label for the bottom of the color bar (default: atom1)")
-parser.add_argument("--atom2_label", default="atom2", type=str, help="Label for the top of the color bar (default: atom2)")
+parser.add_argument("--atom1", default="atom1", type=str, help="Label for the bottom of the color bar (default: atom1)")
+parser.add_argument("--atom2", default="atom2", type=str, help="Label for the top of the color bar (default: atom2)")
 parser.add_argument("--gnuplot", action="store_true", help="Write output file")
+parser.add_argument("--width", default=6, type=float, help="Width of the figure (default: 6)")
+parser.add_argument("--height", default=4, type=float, help="Height of the figure (default: 4)")
+parser.add_argument("--ymax", type=float, help="Maximum y-axis limit in THz.")
+parser.add_argument("--alpha", default=0.8, type=float, help="transparency level (default: 0.8)")
 args = parser.parse_args()
 
 if args.scatter:
@@ -194,38 +209,46 @@ else:
 if scatter_mode:
     # Define colors for different atoms (modify as needed)
     atom_colors = ['cyan', 'm', 'red', 'blue', 'green', 'orange', 'purple', 'pink']
-    atom_labels = [args.atom1_label, args.atom2_label]
+    atom_labels = [args.atom1, args.atom2]
     output_filename = "Phonon_atom_projected_scatter.pdf"
 else:
     atom_colors = None
     output_filename = "Phonon_atom_projected_cmap.pdf"
 
-fig, ax = plt.subplots(figsize=(6, 4))
+fig, ax = plt.subplots(figsize=(args.width, args.height))
 
 if not scatter_mode:
     cmap_name = args.cmap
+    alpha = args.alpha
     norm = cm.colors.Normalize(vmax=0.5, vmin=-0.5)
-    plot_cmap_phonon_band(cmap_name, norm)
+    plot_cmap_phonon_band(cmap_name, norm, alpha)
     cbar = plt.colorbar()
 #    cbar.set_label('Atomic Contribution', rotation=270, labelpad=15, fontsize=18)
     cbar_ticks = [-0.5, 0, 0.5]
-    cbar_ticklabels = [args.atom1_label, "", args.atom2_label]
+    cbar_ticklabels = [args.atom1, "", args.atom2]
     cbar.set_ticks(cbar_ticks)
     cbar.set_ticklabels(cbar_ticklabels)
     cbar.ax.tick_params(labelsize=18)
 else:
-    plot_scatter_phonon_band(atom_colors)
+    s=args.s
+    plot_scatter_phonon_band(atom_colors, s)
     add_legend(atom_labels)
 
 if args.gnuplot:
     output_filename_prefix = "atom_projected_phonon_data"
     write_data_to_file(output_filename_prefix)
 
+if args.ymax is not None:
+    ax.set_ylim(0, args.ymax)
+else:
+    ax.set_ylim(0, np.max(phonon_freq)+1)
+
 x_klabels = [w.replace('G','Γ') for w in x_klabels]
 
-ax.axhline(y=0, color='black', linestyle='--', linewidth=1)  # Zero line
+#ax.axhline(y=0, color='black', linestyle='--', linewidth=1)  # Zero line
 ax.set_ylabel('Frequency (THz)', fontsize=18)
 ax.set_xlim(x_ticks[0], x_ticks[-1])
+
 ax.yaxis.set_major_locator(ticker.MaxNLocator(nbins=4))
 ax.tick_params(axis="x", labelsize=18, direction="in", top=False, length=8, which="major", width=1)
 ax.tick_params(axis="x", which='minor', length=4, direction="in", top=False, width=1)
