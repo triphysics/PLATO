@@ -90,19 +90,41 @@ def read_band_hdf5(filename):
         print("more than 2 atoms are present better use --scatter plot for best results")
         normalized_amplitudes=phonon_amplitudes
  
+ # fix the broken path
     q_ticklabels = []
 
     for label in q_ticklabels1:
         if len(label) > 1:
             # If the string has more than one letter, split it and join with "|"
-            modified_label = ',|'.join(label)
+            modified_label = '|'.join(label)
             q_ticklabels.append(modified_label)
         else:
             q_ticklabels.append(label)
 
     return x, ys, q_ticks, q_ticklabels, normalized_amplitudes, phonon_amplitudes, num_bnd, num_atm,  num_kpt
 
-def plot_cmap_phonon_band(cmap_name, norm, alpha):
+
+
+def read_atom_names_from_poscar(poscar_file_path):
+    try:
+        # Initialize a list to store atom names
+        atom_names = []
+
+        # Read the POSCAR file
+        with open(poscar_file_path, 'r') as file:
+            lines = file.readlines()
+
+        # Extract atom names from the lines
+        if len(lines) >= 6:  # Check if the file has enough lines
+            atom_line = lines[5].split()  # Line containing atom names
+            atom_names = atom_line
+
+        return atom_names
+    except FileNotFoundError:
+        print(f"File '{poscar_file_path}' not found.")
+        return []
+
+def plot_cmap_phonon_band(cmap_name, norm, alpha, sf):
     """
     Plot the cmap phonon band structure for a specific atom.
 
@@ -113,7 +135,7 @@ def plot_cmap_phonon_band(cmap_name, norm, alpha):
 
     for ibnd in range(num_bnd):
         plt.scatter(band_distance1, phonon_freq1[:, ibnd],
-                    s=20 * abs(normalized_amplitudes_all[:, ibnd]),
+                    s=sf * abs(normalized_amplitudes_all[:, ibnd]),
                     c=normalized_amplitudes_all[:, ibnd],
                     cmap=cmap_name, alpha=alpha, norm=norm)
         # Additional code for cmap plot goes here...
@@ -189,15 +211,19 @@ atom_colors = ['cyan', 'm', 'red', 'blue', 'green', 'orange', 'purple', 'pink']
 norm = cm.colors.Normalize(vmax=np.max(normalized_amplitudes_all[:,:]), vmin=np.min(normalized_amplitudes_all[:,:]))
 parser = argparse.ArgumentParser(description="Atom-Projected Phonon Dispersion Plotter")
 parser.add_argument("--scatter", action="store_true", help="Use scatter plot mode")
-parser.add_argument("--s", default=10, type=float, help="size of symbol in scatter plot")
+parser.add_argument("--s", default=10, type=float, help="linewidth in colorbar")
+parser.add_argument("--sf", default=20, type=float, help="size of symbol in scatter plot")
 parser.add_argument("--cmap", default="cool", type=str, help="Use cmap plot mode with specified colormap (default: cool)")
-parser.add_argument("--atom1", default="atom1", type=str, help="Label for the bottom of the color bar (default: atom1)")
-parser.add_argument("--atom2", default="atom2", type=str, help="Label for the top of the color bar (default: atom2)")
+#parser.add_argument("--atom1", default="atom1", type=str, help="Label for the bottom of the color bar (default: atom1)")
+#parser.add_argument("--atom2", default="atom2", type=str, help="Label for the top of the color bar (default: atom2)")
 parser.add_argument("--gnuplot", action="store_true", help="Write output file")
 parser.add_argument("--width", default=6, type=float, help="Width of the figure (default: 6)")
 parser.add_argument("--height", default=4, type=float, help="Height of the figure (default: 4)")
 parser.add_argument("--ymax", type=float, help="Maximum y-axis limit in THz.")
 parser.add_argument("--alpha", default=0.8, type=float, help="transparency level (default: 0.8)")
+#parser.add_argument("--mat", type=str, help="name of the material")
+parser.add_argument("--ys", type=float, help="shift of title from ymax")
+parser.add_argument("--format",default="png", type=str, help="Format of the output file")
 args = parser.parse_args()
 
 if args.scatter:
@@ -205,27 +231,42 @@ if args.scatter:
 else:
     scatter_mode = False
 
+# Specify the path to your POSCAR file
+poscar_file_path = 'infile.ucposcar'
+
+# Get the atom names from the POSCAR file
+atom_names = read_atom_names_from_poscar(poscar_file_path)
+material = ''.join(atom_names)
+
+#atom1=atom_names[0]
+#atom2=atom_names[1]
+
+# Print the extracted atom names
+
 
 if scatter_mode:
     # Define colors for different atoms (modify as needed)
     atom_colors = ['cyan', 'm', 'red', 'blue', 'green', 'orange', 'purple', 'pink']
-    atom_labels = [args.atom1, args.atom2]
-    output_filename = "Phonon_atom_projected_scatter.pdf"
+    atom_labels = atom_names
+    #[atom_names[0], atom_names[0]]
+    output_filename = "Phonon_atom_projected_scatter." + args.format
 else:
     atom_colors = None
-    output_filename = "Phonon_atom_projected_cmap.pdf"
+    output_filename = "Phonon_atom_projected_cmap." + args.format
 
 fig, ax = plt.subplots(figsize=(args.width, args.height))
 
 if not scatter_mode:
     cmap_name = args.cmap
+    sf=args.sf
     alpha = args.alpha
     norm = cm.colors.Normalize(vmax=0.5, vmin=-0.5)
-    plot_cmap_phonon_band(cmap_name, norm, alpha)
+    plot_cmap_phonon_band(cmap_name, norm, alpha,sf)
     cbar = plt.colorbar()
+    cbar.solids.set(alpha=1)
 #    cbar.set_label('Atomic Contribution', rotation=270, labelpad=15, fontsize=18)
     cbar_ticks = [-0.5, 0, 0.5]
-    cbar_ticklabels = [args.atom1, "", args.atom2]
+    cbar_ticklabels = [atom_names[0], "", atom_names[1]]
     cbar.set_ticks(cbar_ticks)
     cbar.set_ticklabels(cbar_ticklabels)
     cbar.ax.tick_params(labelsize=18)
@@ -260,6 +301,14 @@ plt.xticks(x_ticks, x_klabels)
 
 for distance in x_ticks[:]:
     plt.axvline(x=distance, ls='--', color='gray', alpha=0.8, lw=0.5)
+
+ 
+center_x = (x_ticks[-1]) / 2
+    
+if args.ys is not None:
+    plt.text(center_x, args.ymax-args.ys, material, fontsize=18, color='black', ha='center', va='center')
+else:
+    plt.text(center_x, args.ymax-1.0, material, fontsize=18, color='black', ha='center', va='center')
 
 plt.tight_layout()
 plt.savefig(output_filename)
