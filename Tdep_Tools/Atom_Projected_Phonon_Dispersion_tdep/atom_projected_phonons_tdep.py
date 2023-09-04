@@ -249,10 +249,10 @@ if scatter_mode:
     atom_colors = ['cyan', 'm', 'red', 'blue', 'green', 'orange', 'purple', 'pink']
     atom_labels = atom_names
     #[atom_names[0], atom_names[0]]
-    output_filename = "Phonon_atom_projected_scatter." + args.format
+    output_filename = material+"Phonon_atom_projected_scatter." + args.format
 else:
-    atom_colors = None
-    output_filename = "Phonon_atom_projected_cmap." + args.format
+#    atom_colors = None
+    output_filename = material+"_Phonon_atom_projected_cmap." + args.format
 
 fig, ax = plt.subplots(figsize=(args.width, args.height))
 
@@ -262,7 +262,7 @@ if not scatter_mode:
     alpha = args.alpha
     norm = cm.colors.Normalize(vmax=0.5, vmin=-0.5)
     plot_cmap_phonon_band(cmap_name, norm, alpha,sf)
-    cbar = plt.colorbar()
+    cbar = plt.colorbar(pad=0.02)
     cbar.solids.set(alpha=1)
 #    cbar.set_label('Atomic Contribution', rotation=270, labelpad=15, fontsize=18)
     cbar_ticks = [-0.5, 0, 0.5]
@@ -279,10 +279,15 @@ if args.gnuplot:
     output_filename_prefix = "atom_projected_phonon_data"
     write_data_to_file(output_filename_prefix)
 
+center_x = (x_ticks[-1]) / 2
+
 if args.ymax is not None:
     ax.set_ylim(0, args.ymax)
+    plt.text(center_x, args.ymax-1.0, material, fontsize=18, color='black', ha='center', va='center')
 else:
     ax.set_ylim(0, np.max(phonon_freq)+1)
+    plt.text(center_x, np.max(phonon_freq)-1.0, material, fontsize=18, color='black', ha='center', va='center')
+
 
 x_klabels = [w.replace('G','Γ') for w in x_klabels]
 
@@ -302,14 +307,6 @@ plt.xticks(x_ticks, x_klabels)
 for distance in x_ticks[:]:
     plt.axvline(x=distance, ls='--', color='gray', alpha=0.8, lw=0.5)
 
- 
-center_x = (x_ticks[-1]) / 2
-    
-if args.ys is not None:
-    plt.text(center_x, args.ymax-args.ys, material, fontsize=18, color='black', ha='center', va='center')
-else:
-    plt.text(center_x, args.ymax-1.0, material, fontsize=18, color='black', ha='center', va='center')
-
 plt.tight_layout()
-plt.savefig(output_filename)
+plt.savefig(output_filename, dpi=300)
 plt.show()
