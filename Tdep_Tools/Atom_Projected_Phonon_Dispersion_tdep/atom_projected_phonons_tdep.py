@@ -198,6 +198,7 @@ band_distance, phonon_freq, x_ticks, x_klabels,normalized_amplitudes, phonon_amp
 print(x_klabels)
 
 normalized_amplitudes_all =  []
+
 for iatm in range(num_atm):
     normalized_amplitudes_all =np.append(normalized_amplitudes_all, normalized_amplitudes[:,:,iatm])
 
@@ -221,8 +222,9 @@ parser.add_argument("--width", default=6, type=float, help="Width of the figure 
 parser.add_argument("--height", default=4, type=float, help="Height of the figure (default: 4)")
 parser.add_argument("--ymax", type=float, help="Maximum y-axis limit in THz.")
 parser.add_argument("--alpha", default=0.8, type=float, help="transparency level (default: 0.8)")
-#parser.add_argument("--mat", type=str, help="name of the material")
-parser.add_argument("--ys", type=float, help="shift of title from ymax")
+parser.add_argument("--mat", type=bool, help="name of the material")
+parser.add_argument("--ys", type=float, default=0.5, help="shift of title from ymax (default 0.5)")
+parser.add_argument("--ybin", type=float, help="number of bins on yaxis")
 parser.add_argument("--format",default="png", type=str, help="Format of the output file")
 args = parser.parse_args()
 
@@ -236,7 +238,10 @@ poscar_file_path = 'infile.ucposcar'
 
 # Get the atom names from the POSCAR file
 atom_names = read_atom_names_from_poscar(poscar_file_path)
-material = ''.join(atom_names)
+if args.mat is not None:
+    material = ''.join(reversed(atom_names))
+else:
+    material = ''.join(atom_names)
 
 #atom1=atom_names[0]
 #atom2=atom_names[1]
@@ -262,7 +267,7 @@ if not scatter_mode:
     alpha = args.alpha
     norm = cm.colors.Normalize(vmax=0.5, vmin=-0.5)
     plot_cmap_phonon_band(cmap_name, norm, alpha,sf)
-    cbar = plt.colorbar(pad=0.02)
+    cbar = plt.colorbar(pad=0.0)
     cbar.solids.set(alpha=1)
 #    cbar.set_label('Atomic Contribution', rotation=270, labelpad=15, fontsize=18)
     cbar_ticks = [-0.5, 0, 0.5]
@@ -283,10 +288,10 @@ center_x = (x_ticks[-1]) / 2
 
 if args.ymax is not None:
     ax.set_ylim(0, args.ymax)
-    plt.text(center_x, args.ymax-1.0, material, fontsize=18, color='black', ha='center', va='center')
+    plt.text(center_x, args.ymax-args.ys, material, fontsize=18, color='black', ha='center', va='center')
 else:
     ax.set_ylim(0, np.max(phonon_freq)+1)
-    plt.text(center_x, np.max(phonon_freq)-1.0, material, fontsize=18, color='black', ha='center', va='center')
+    plt.text(center_x, np.max(phonon_freq)-args.ys, material, fontsize=18, color='black', ha='center', va='center')
 
 
 x_klabels = [w.replace('G','Γ') for w in x_klabels]
@@ -295,7 +300,10 @@ x_klabels = [w.replace('G','Γ') for w in x_klabels]
 ax.set_ylabel('Frequency (THz)', fontsize=18)
 ax.set_xlim(x_ticks[0], x_ticks[-1])
 
-ax.yaxis.set_major_locator(ticker.MaxNLocator(nbins=4))
+if args.ybin is not None:
+    ax.yaxis.set_major_locator(ticker.MaxNLocator(nbins=args.ybin))
+else:
+    ax.yaxis.set_major_locator(ticker.MaxNLocator(nbins=4))
 ax.tick_params(axis="x", labelsize=18, direction="in", top=False, length=8, which="major", width=1)
 ax.tick_params(axis="x", which='minor', length=4, direction="in", top=False, width=1)
 ax.tick_params(axis="y", labelsize=18, direction="in", right=True, length=8, which="major", width=1)
@@ -308,5 +316,5 @@ for distance in x_ticks[:]:
     plt.axvline(x=distance, ls='--', color='gray', alpha=0.8, lw=0.5)
 
 plt.tight_layout()
-plt.savefig(output_filename, dpi=300)
+plt.savefig(output_filename, dpi=200, bbox_inches='tight')
 plt.show()
