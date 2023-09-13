@@ -1,3 +1,18 @@
+"""
+Interatomic Force Constants Extraction Script
+
+This script is designed to extract interatomic force constants with a smaller cutoff from a previous set of calculations
+that were performed with a larger cutoff, all at a fixed supercell size. It accomplishes this by comparing the input
+POSCAR files for the smaller cutoff calculations with those of the larger cutoff calculations and copying relevant
+VASP output files (vasprun.xml) to new directories for further analysis.
+
+Usage:
+    - Place this script in the directory where the smaller cutoff calculations were performed.
+    - Ensure that the corresponding larger cutoff calculations are in a parent directory (e.g., "../").
+    - Run the script to identify matching calculations and create new directories for the smaller cutoff results.
+
+"""
+
 import os
 import shutil
 import glob
@@ -29,3 +44,4 @@ for i in sorted(os.listdir(".")):
 
             if not aa:
                 print(s)
+
