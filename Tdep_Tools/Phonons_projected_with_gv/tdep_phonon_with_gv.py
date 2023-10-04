@@ -51,7 +51,7 @@ def read_band_hdf5(filename):
 
     return x, ys, q_ticks, q_ticklabels, num_bnd, num_atm,  num_kpt, gv
 
-def plot_cmap_phonon_band(cmap_name, norm, alpha):
+def plot_cmap_phonon_band(cmap_name, norm, alpha,s):
     """
     Plot the cmap phonon band structure for a specific atom.
 
@@ -62,7 +62,7 @@ def plot_cmap_phonon_band(cmap_name, norm, alpha):
 
     for ibnd in range(num_bnd):
         plt.scatter(band_distance, phonon_freq[:, ibnd],
-                    s=20,
+                    s=s,
                     c=gv[:, ibnd],
                     cmap=cmap_name, alpha=alpha, norm=norm)
 
@@ -96,6 +96,7 @@ parser.add_argument("--format", default="png", type=str, help="Output file forma
 parser.add_argument("--width", default=6, type=float, help="Width of the figure (default: 6)")
 parser.add_argument("--height", default=4, type=float, help="Height of the figure (default: 4)")
 parser.add_argument("--ymax", type=float, help="Maximum y-axis limit in THz.")
+parser.add_argument("--s", type=float, default=10, help="Symbol size for plotting. (default: 10)")
 
 
 args = parser.parse_args()
@@ -112,8 +113,9 @@ fig, ax = plt.subplots(figsize=(args.width, args.height))
 
 cmap_name = args.cmap
 alpha =args.alpha
+s=args.s
 norm = cm.colors.Normalize(vmax=np.max(gv), vmin=np.min(gv))
-plot_cmap_phonon_band(cmap_name, norm,alpha)
+plot_cmap_phonon_band(cmap_name, norm,alpha,s)
 cbar = plt.colorbar()
 cbar.set_label('v (km/s)', rotation=270, labelpad=35, fontsize=18)
 cbar.ax.tick_params(labelsize=18)
